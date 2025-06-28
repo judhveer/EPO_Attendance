@@ -23,6 +23,7 @@
     "mysql2": "^3.14.1",
     "node-cron": "^4.1.0",
     "nodemon": "^3.1.10",
-    "sequelize": "^6.37.7"
+    "sequelize": "^6.37.7",
+    "telegraf": "^4.16.3"
   }
 }

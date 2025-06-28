@@ -84,11 +84,9 @@ exports.syncAttendance = async (req, res) => {
 
   try {
     const rows = await getSheetData();
-    // console.log('Sheet data rows value: ', rows);
 
     const [header, ...dataRows] = rows;
-    // console.log("header: ", header);
-    // console.log('Parsed data: ', dataRows);
+  
 
     // Identify columns
     const COLS = {
@@ -99,22 +97,14 @@ exports.syncAttendance = async (req, res) => {
       photo: header.findIndex(h => h.toLowerCase().includes('photo')),
     };
 
-    console.log("COlS: ", COLS);
-
 
     // Map for each employee's attendance (per day)
     const attendanceMap = {};
     // Current IST date/time
     let nowIST = DateTime.now().setZone('Asia/Kolkata');
     console.log("nowIST: ", nowIST);
-    const fixedTimeIST = nowIST.set({
-      hour: 13,  // 1 PM (24-hour format)
-      minute: 0,
-      second: 0,
-      millisecond: 0
-    });
-    // console.log("fixedTimeIST: ", fixedTimeIST);
-    // nowIST = fixedTimeIST;
+
+
     const todayStr = getDateStringFromDate(nowIST);
 
 
@@ -129,9 +119,7 @@ exports.syncAttendance = async (req, res) => {
       if (!timestamp) continue;
 
 
-      // console.log("timestamp: ", timestamp);
       const dateStr = getDateStringFromDate(timestamp);
-      // console.log("dateStr: ", dateStr);
 
       if (dateStr !== todayStr) continue; // Process ONLY today's records
 
@@ -156,7 +144,6 @@ exports.syncAttendance = async (req, res) => {
       // Initialize map entry if needed
       if (!attendanceMap[name]) attendanceMap[name] = {};
 
-      // console.log("attendanceMap[name]: ", attendanceMap);
 
       if (action === 'IN') {
         // Only keep earliest IN
@@ -193,7 +180,6 @@ exports.syncAttendance = async (req, res) => {
 
       const where = { name, date: todayStr, action: 'IN' };
       const existing = await Attendance.findOne({ where });
-      // console.log("existing: ", existing);
 
       if (!check_in_time) {
         if (nowIST >= absentCutoff) {
@@ -233,16 +219,13 @@ exports.syncAttendance = async (req, res) => {
 
       // PRESENT/LATE
       const checkInDate = parseCustomTimestamp(check_in_time);
-      console.log("checkInDate: ", checkInDate);
+      // console.log("checkInDate: ", checkInDate);
       if (checkInDate > officeStart) {
         const late_time_calculation = Math.round(checkInDate.diff(officeStart, 'minutes').minutes);
         // Convert minutes to hours and remaining minutes
         const hours = Math.floor(late_time_calculation / 60);  // Full hours
         const minutes = late_time_calculation % 60;
         late_minutes = `${hours}h ${minutes}min`;
-
-        console.log("late_minutes: ", late_minutes);
-
         status = 'LATE';
       } else {
         status = 'PRESENT';
@@ -252,14 +235,11 @@ exports.syncAttendance = async (req, res) => {
       // Auto check-out at 6 PM if not out and now is after 10 PM
       console.log("nowIST.hour: ", nowIST.hour);
       console.log(typeof nowIST.hour);
-      if (!check_out_time && nowIST.hour >= 24) {
+      if (!check_out_time && nowIST.hour >= 20) {
         check_out_time = nowIST.toFormat('dd/LL/yyyy') + ' 18:00:00';
       }
 
       // Calculate shift time if check-out exists
-      console.log("check_in_time: ", check_in_time);
-      console.log("check_out_time: ", check_out_time);
-
       if (check_in_time && check_out_time) {
         const checkOutDate = parseCustomTimestamp(check_out_time);
         shift_time = msToHMS(checkOutDate.toMillis() - checkInDate.toMillis());
@@ -305,6 +285,7 @@ exports.syncAttendance = async (req, res) => {
     isSyncing = false;
   }
 };
+
 
 
 

@@ -1,22 +1,15 @@
-'use strict';
-const { Model } = require('sequelize');
-module.exports = (sequelize, DataTypes) => {
-  class TelegramUser extends Model {
-    static associate(models) {}
+const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
+
+const TelegramUser = sequelize.define("TelegramUser", {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  chat_id: {
+    type: DataTypes.BIGINT,
+    unique: true,
   }
-  TelegramUser.init({
-    name: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    chat_id: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: false,
-    }
-  }, {
-    sequelize,
-    modelName: 'TelegramUser',
-  });
-  return TelegramUser;
-};
+});
+
+module.exports = TelegramUser;

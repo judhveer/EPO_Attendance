@@ -6,6 +6,10 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 
+const sequelize = require('./config/db');
+
+
+
 
 require('dotenv').config();
 const express = require('express');
@@ -20,8 +24,10 @@ const { TelegramUser, Attendance } = require('./models');
 const { sendTelegramMessage } = require('./utils/telegram');
 const TELEGRAM_TOKEN = process.env.TELEGRAM_TOKEN;
 const { DateTime } = require('luxon');
+const bot = require("./utils/bot");
 
-const { startTelegramUserSync } = require('./utils/telegramUserSync');
+
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -34,19 +40,49 @@ app.use(cors({
 
 app.use(helmet());
 
+
+app.use(express.static('dist'));
+
+
 app.use(express.json());
 app.use('/api/attendance', attendanceRoutes);
 
 
-
-startTelegramUserSync();  // Starts polling in the background automatically
 
 
 
 
 // At minute 0 past every hour from 10 through 18 (10 AM - 6 PM) every day
 // 0 10-20 * * *
-cron.schedule('0,15 10-21 * * *', async () => {
+
+// Morning + Early Afternoon: every 5 minutes from 9:00 to 13:55
+cron.schedule('*/5 9-13 * * *', async () => {
+  try {
+    console.log('Running attendance sync cron job (office hours)...');
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
+    const res = await axios.get(`${BASE_URL}/api/attendance/sync`);
+    console.log('Attendance sync result:', res.data);
+  } catch (error) {
+    console.error('Attendance sync cron failed:', error.response?.data || error.message);
+  }
+});
+
+
+// Evening: every 5 minutes from 17:00 to 20:55
+cron.schedule('*/5 17-20 * * *', async () => {
+  try {
+    console.log('Running attendance sync cron job (office hours)...');
+    const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
+    const res = await axios.get(`${BASE_URL}/api/attendance/sync`);
+    console.log('Attendance sync result:', res.data);
+  } catch (error) {
+    console.error('Attendance sync cron failed:', error.response?.data || error.message);
+  }
+});
+
+// Once at 21:00
+
+cron.schedule('0 21 * * *', async () => {
   try {
     console.log('Running attendance sync cron job (office hours)...');
     const BASE_URL = process.env.BASE_URL || 'http://localhost:5000';
@@ -61,7 +97,7 @@ cron.schedule('0,15 10-21 * * *', async () => {
 
 
 
-cron.schedule('0,30 18-20 * * *', async () => {
+cron.schedule('0,15 18-20 * * *', async () => {
   const today = DateTime.now().setZone('Asia/Kolkata').toFormat('yyyy-MM-dd');
 
   console.log("today:", today);
@@ -69,22 +105,22 @@ cron.schedule('0,30 18-20 * * *', async () => {
   const missingCheckout = await Attendance.findAll({
     where: {
       date: today,
-      check_in_time: {[Op.not]: null},
+      check_in_time: { [Op.not]: null },
       check_out_time: null
     }
   });
   console.log('Missing checkout records:', missingCheckout.map(r => r.name));
 
-  for (const record of missingCheckout){
+  for (const record of missingCheckout) {
     const user = await TelegramUser.findOne({
-      where : {
+      where: {
         name: record.name
       }
     });
 
     console.log('User:', user);
 
-    if(user && user.chat_id){
+    if (user && user.chat_id) {
       await sendTelegramMessage(
         user.chat_id,
         `Hi ${record.name}, you forgot to check out. Please check out at your earliest convenience and please remember to do so next time. Thanks`
@@ -98,6 +134,21 @@ cron.schedule('0,30 18-20 * * *', async () => {
 
 
 
+(async () => {
+  try {
+    await sequelize.sync({ alter: true }); // sync DB
+    console.log("Database synced");
+    await bot.telegram.deleteWebhook();
+    bot.launch();
+    // start bot
+    console.log("Bot is running");
+  } catch (error) {
+    console.log("Startup error: ", error);
+  }
+})();
+
+
+
 
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -105,3 +156,7 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 // app.listen(PORT, "0.0.0.0", () => {
 //   console.log(`Backend running on http://0.0.0.0:${PORT}`);
 // });
+
+
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
