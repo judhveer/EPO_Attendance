@@ -1,6 +1,6 @@
 # 🏢 EPO Attendance Project
 
-**A robust, production-grade, real-time attendance and employee management platform deployed for [Eastern Panorama Offset, Shillong](https://www.easternpanorama.in/), built with Node.js, Express, Sequelize, MySQL, and Telegram Bot.**
+**A robust, production-grade, real-time attendance and employee management platform deployed for [Eastern Panorama Offset, Shillong](https://www.easternpanorama.com/), built with Node.js, Express, Sequelize, MySQL, and Telegram Bot.**
 
 ---
 
@@ -15,7 +15,6 @@ Deployed on the company's in-house server, it automates attendance collection, a
 
 - **Telegram Bot Integration**
   - Employees self-register via `/register` command.
-  - Employees mark attendance (`IN`, `OUT`) through Telegram.
   - Bot automatically notifies employees for missing check-outs.
 - **Google Sheets Sync**
   - Fetches attendance logs directly from Google Sheets for backup & reconciliation.
@@ -37,7 +36,7 @@ Deployed on the company's in-house server, it automates attendance collection, a
   - Unique constraints at the DB/model level to prevent duplicate records.
   - Modular, well-organized codebase (controllers, models, routes, utils, scripts).
 - **In-House Deployment**
-  - Runs on Windows/Linux in company premises, fully private and secure.
+  - Runs on Windows in company premises, fully private and secure.
 - **Sample Data & Seed Scripts**
   - Seeder scripts included for quick onboarding of new employees.
   - Bulk sync/insert/clean-up utilities for database hygiene.
@@ -77,9 +76,6 @@ backend/
 frontend/
 ├─ ... # Admin dashboard UI (if included)
 
-yaml
-Copy
-Edit
 
 ---
 
@@ -91,9 +87,11 @@ Edit
 git clone https://github.com/your-username/epo-attendance-project.git
 cd epo-attendance-project/backend
 npm install
-2. Environment Setup
-Create .env in /backend:
 
+
+### 2. Environment Setup
+
+Create .env in /backend:
 
 DB_USER=your_mysql_user
 DB_PASS=your_mysql_pass
@@ -106,29 +104,24 @@ SHEET_ID=your_google_sheet_id
 GOOGLE_API_KEY=your_google_api_key
 
 
-3. Database Prep
+### 3. Database Prep
+
 Start your MySQL server and create the attendance_db database (empty; tables auto-created).
 [Optional] Run the seeder script to add employees:
 node scripts/seedDoers.js
 
 
-4. Start the Server
-bash
-Copy
-Edit
+###  4. Start the Server
+
 node app.js
 Backend will run at http://localhost:5000.
 
 🤖 Telegram Bot Usage
 /register – Register your Telegram account with the system
 
-/in – Mark check-in
-
-/out – Mark check-out
-
 Employees receive reminders if they forget to check-out.
 
-Only recognized employees (in TelegramUser table) can register/mark attendance.
+Only recognized employees (in TelegramUser table) can register.
 
 🕒 Cron Job Schedule
 Morning+Afternoon: Every 5 min, 9:00–13:55 IST
@@ -175,15 +168,6 @@ Modular codebase – easy to extend or audit
 
 No hardcoded secrets or production credentials in source
 
-📸 Screenshots (optional)
-<!-- ![Dashboard Example](./assets/dashboard_screenshot.png) ![Telegram Attendance](./assets/telegram_attendance.gif) -->
-🧑‍💻 Author
-Jarya (Backend Developer & Systems Integrator)
-
-LinkedIn | GitHub
-
-📢 License
-MIT License (or specify your license)
 
 🙏 Acknowledgements
 Special thanks to Eastern Panorama Offset, Shillong, for trusting me with their mission-critical attendance system!
