@@ -89,6 +89,8 @@ cd epo-attendance-project/backend
 npm install
 ```
 
+---
+
 ### 2. **Environment Setup**
 
 Create a `.env` file in `/backend`:
@@ -105,6 +107,8 @@ SHEET_ID=your_google_sheet_id
 GOOGLE_API_KEY=your_google_api_key
 ```
 
+---
+
 ### 3. **Database Prep**
 
 Start your MySQL server and create the `attendance_db` database (empty; tables auto-created).
@@ -114,6 +118,8 @@ Start your MySQL server and create the `attendance_db` database (empty; tables a
 ```bash
 node utils/seed/addNameInDb.js
 ```
+
+---
 
 ### 4. **Start the Server**
 
