@@ -63,36 +63,37 @@ Deployed on the company's in-house server, it automates attendance collection, a
 
 ## 🗂️ Project Structure
 
-
+```
 backend/
-├─ config/ # DB and server configs
-├─ controllers/ # All business logic (including attendance processing)
-├─ models/ # Sequelize models (no migrations, only models)
-├─ routes/ # Express routes
-├─ scripts/ # Seeder/utility scripts
-├─ utils/ # Telegram bot, Google Sheets, helpers
+├─ config/               # DB and server configs
+├─ controllers/          # All business logic (attendance processing)
+├─ models/               # Sequelize models (no migrations)
+├─ routes/               # Express routes
+├─ scripts/              # Seeder/utility scripts
+├─ utils/                # Telegram bot, Google Sheets, helpers
 ├─ attendance_dummy.json # Sample/mock data
-├─ app.js # Main server file
+├─ app.js                # Main server file
 frontend/
-├─ ... # Admin dashboard UI (if included)
-
+├─ ...                   # Admin dashboard UI (if included)
+```
 
 ---
 
 ## ⚡ Quick Start
 
-### 1. Clone & Install
+### 1. **Clone & Install**
 
 ```bash
 git clone https://github.com/your-username/epo-attendance-project.git
 cd epo-attendance-project/backend
 npm install
+```
 
+### 2. **Environment Setup**
 
-### 2. Environment Setup
+Create a `.env` file in `/backend`:
 
-Create .env in /backend:
-
+```ini
 DB_USER=your_mysql_user
 DB_PASS=your_mysql_pass
 DB_NAME=attendance_db
@@ -102,93 +103,115 @@ BASE_URL=http://localhost:5000
 FRONTEND_URL=http://localhost:5173
 SHEET_ID=your_google_sheet_id
 GOOGLE_API_KEY=your_google_api_key
+```
 
+### 3. **Database Prep**
 
-### 3. Database Prep
+Start your MySQL server and create the `attendance_db` database (empty; tables auto-created).
 
-Start your MySQL server and create the attendance_db database (empty; tables auto-created).
-[Optional] Run the seeder script to add employees:
-node scripts/seedDoers.js
+*(Optional) Seed employee data:*
 
+```bash
+node utils/seed/addNameInDb.js
+```
 
-###  4. Start the Server
+### 4. **Start the Server**
 
+```bash
 node app.js
-Backend will run at http://localhost:5000.
+```
 
-🤖 Telegram Bot Usage
-/register – Register your Telegram account with the system
+Backend will run at [http://localhost:5000](http://localhost:5000).
 
-Employees receive reminders if they forget to check-out.
+---
 
-Only recognized employees (in TelegramUser table) can register.
+## 🤖 Telegram Bot Usage
 
-🕒 Cron Job Schedule
-Morning+Afternoon: Every 5 min, 9:00–13:55 IST
+* `/register` – Register your Telegram account with the system
+* Employees receive reminders if they forget to check-out.
+* Only recognized employees (in TelegramUser table) can register.
 
-Evening: Every 5 min, 17:00–20:55 IST
+---
 
-Night: Once at 21:00 IST
+## 🕒 Cron Job Schedule
 
-Customizable via node-cron
+* **Morning + Afternoon:** Every 5 min, 9:00–13:55 IST
+* **Evening:** Every 5 min, 17:00–20:55 IST
+* **Night:** Once at 21:00 IST
+  *(Customizable via node-cron)*
 
-🧩 Features Showcase
-No Duplicates: Robust DB logic & unique constraints; multiple syncs don’t create double entries.
+---
 
-Flexible Sync: Admin can trigger full re-sync for all days if any server downtime/data loss.
+## 🧩 Features Showcase
 
-Google Sheets: Pulls and processes data from live Google Sheets attendance logs.
+* **No Duplicates:** Robust DB logic & unique constraints.
+* **Flexible Sync:** Full re-sync for all days, correcting for downtime/data loss.
+* **Google Sheets Integration:** Pulls/processes data from live Google Sheets logs.
+* **Auto Attendance Mapping:** For each employee & day, earliest IN and latest OUT detected.
+* **Status Logic:**
 
-Auto Attendance Map: For each employee, each day, earliest IN and latest OUT are auto-detected.
+  * **PRESENT** if on time
+  * **LATE** if after cut-off
+  * **ABSENT** if no IN by cutoff
+* **Shift Time Calculation:** Accurate calculation of working hours.
+* **Admin Tools:** View/export attendance, manage employees, add/remove records.
 
-Status Logic:
+---
 
-PRESENT if on time,
+## 🛡️ Security & Best Practices
 
-LATE if after cut-off,
+* `.env` for all credentials and config
+* Uses CORS, Helmet, input validation
+* Modular and auditable codebase
+* No hardcoded secrets
 
-ABSENT if no IN by cutoff.
+---
 
-Shift Time Calculation: Accurate calculation of daily working hours.
+## 📸 Screenshots
 
-Admin Tools:
+*(Add screenshots or GIFs here, e.g., Telegram bot interaction, dashboard, etc. If you need help making or embedding them, let me know!)*
 
-Easily view/export attendance
+---
 
-Manage employees
+## 🙏 Acknowledgements
 
-Add/remove records
+Special thanks to **Eastern Panorama Offset, Shillong** for their trust and feedback!
+Thanks to the open-source community for Sequelize, Luxon, Telegraf, Express, and others.
 
-🛡️ Security & Best Practices
-.env config for all credentials
+---
 
-Uses CORS, Helmet, and input validation
+## ✨ Why This Project Stands Out
 
-Modular codebase – easy to extend or audit
+* **Deployed in a real business:** Used daily by all employees at Eastern Panorama Offset.
+* **Solves real-world challenges:** Handles downtime, missing check-outs, re-syncs, and more.
+* **Clean, scalable code:** No migration hassle, simple and robust upsert logic, instantly extensible.
+* **Professional stack:** Modern, secure, and maintainable.
+* **Full documentation and easy onboarding for future adopters.**
 
-No hardcoded secrets or production credentials in source
+---
 
+## 🧑‍💻 Author & Contact
 
-🙏 Acknowledgements
-Special thanks to Eastern Panorama Offset, Shillong, for trusting me with their mission-critical attendance system!
+**Judhveer**
+[www.linkedin.com/in/judhveer](https://www.linkedin.com/in/judhveer)
 
-Thanks to the open-source community for great libraries like Sequelize, Luxon, Telegraf, and Express.
+---
 
-💡 How to Contribute
+## 💡 How to Contribute
+
 Pull requests welcome! For major changes, please open an issue first.
 
-✨ Why This Project Stands Out
-Live deployed in a real business: Used daily by all employees at Eastern Panorama Offset.
+---
 
-Handles real-world edge cases: Server downtime, missing check-outs, rapid re-syncs, bulk corrections—all solved.
+## 📈 Interested Companies/HR
 
-Clean, scalable engineering: No migration pain, simple yet powerful upsert logic, instantly extensible.
+This repo showcases my ability to build real-world, production-grade, reliable backend systems, integrate with external APIs (Telegram, Google Sheets), implement robust business logic, and deliver clear, maintainable code.
+**Let’s work together!**
 
-Professional stack: Modern Node.js, proven libraries, secure and maintainable.
+---
 
-Full documentation, seed scripts, and setup instructions for easy adoption elsewhere.
+Just **copy-paste this whole thing** into your README.md, and it will render with proper code blocks, bullet points, and sections!
 
-📈 Interested Companies/HR
-This repo showcases my ability to build real-world, production-level, reliable backend systems, integrate with external APIs (Telegram, Google Sheets), implement robust business logic, and deliver clear, maintainable code.
-Let’s work together!
+Let me know if you want it with badges, GIFs, or further formatting tweaks! 🚀
+
 
