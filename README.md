@@ -175,7 +175,7 @@ Backend will run at [http://localhost:5000](http://localhost:5000).
 
 ## 📸 Screenshots
 
-*(Add screenshots or GIFs here, e.g., Telegram bot interaction, dashboard, etc. If you need help making or embedding them, let me know!)*
+*(will upload soon)*
 
 ---
 
