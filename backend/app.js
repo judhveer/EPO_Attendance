@@ -48,6 +48,18 @@ app.use(express.json());
 app.use('/api/attendance', attendanceRoutes);
 
 
+const { startWeeklyReportJob } = require('./jobs/scheduleWeeklyReport');
+startWeeklyReportJob();
+const { startMonthlyReportJob } = require('./jobs/scheduleMonthlyReport.js');
+startMonthlyReportJob();
+const { startAccountantMonthlyReportJob } = require('./jobs/scheduleAccountantMonthlyReport');
+startAccountantMonthlyReportJob();
+
+
+
+// const { generateWeeklyAttendancePDF } = require('./reports/weeklyAttendance');
+// generateWeeklyAttendancePDF().then(console.log).catch(console.error);
+
 
 
 
@@ -136,7 +148,7 @@ cron.schedule('0,15 18-20 * * *', async () => {
 
 (async () => {
   try {
-    await sequelize.sync({ alter: true }); // sync DB
+    await sequelize.sync({ alter: false }); // sync DB
     console.log("Database synced");
     await bot.telegram.deleteWebhook();
     bot.launch();
